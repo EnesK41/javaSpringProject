@@ -12,5 +12,6 @@ import com.example.demo.entity.Publisher;
 public interface NewsRepository extends JpaRepository<News, Long> {
     List<News> findByCountry(String country);
     List<News> findByCity(String city);
+    List<News> findByCategory(String category);
     List<News> findByPublisher(Publisher publisher);
 }

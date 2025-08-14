@@ -17,7 +17,7 @@ public class News {
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
     private String url;
-    
+    private long views;
 }
 
 
