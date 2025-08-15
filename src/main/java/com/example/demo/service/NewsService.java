@@ -6,15 +6,19 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.News;
+import com.example.demo.entity.User;
 import com.example.demo.repository.NewsRepository;
 
 @Service
-public class NewsService {
+public class NewsService {  //Services are singleton that means there is only one of them
     private final NewsRepository newsRepository;
+    private final UserService userService;
 
     //@Autowired - Maybe i will need it at some point, remove in the end
-    public NewsService(NewsRepository newsRepository){
+    public NewsService(NewsRepository newsRepository, UserService userService){
         this.newsRepository = newsRepository;
+        this.userService = userService;
+        
     }
 
     public List<News> findByCategory(String category){
@@ -32,4 +36,12 @@ public class NewsService {
     public List<News> findByPublisher(String publisher){
         return newsRepository.findByCountry(publisher);
     }
+
+    public void openNews(News news, User user){
+        news.setViews(news.getViews()+1);
+        newsRepository.save(news);
+
+        userService.openNews(user,news);
+    }
+
 }

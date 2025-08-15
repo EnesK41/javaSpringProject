@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.entity.News;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 
@@ -19,6 +21,9 @@ public class UserService {
     }
 
     public void saveUser(User user){
+        if(userRepository.findByEmail(user.getEmail()) != null){
+            return; //Will update
+        }
         userRepository.save(user);
     }
 
@@ -34,5 +39,23 @@ public class UserService {
 
     public List<User> allUsers(){
         return userRepository.findAll();
+    }
+
+    public void openNews(User user, News news){
+        user.setPoints(user.getPoints()+1);
+    }
+
+    /*public void likeNews(User user, News news){
+        e
+    }*/
+
+    public void bookmarkNews(User user, News news){
+        List<News> bookmarks = user.getBookmarks();
+        if(bookmarks == null){
+            bookmarks = new ArrayList<>();
+            user.setBookmarks(bookmarks);
+        }
+        bookmarks.add(news);
+        userRepository.save(user);
     }
 }

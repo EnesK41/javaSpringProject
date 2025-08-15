@@ -4,14 +4,12 @@ import java.util.List;
 import jakarta.persistence.*;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
-public class Publisher {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String name;
+@EqualsAndHashCode(callSuper = false)
+public class Publisher extends Account {
     private long points;
     @OneToMany(mappedBy = "publisher")
     private List<News> news;
