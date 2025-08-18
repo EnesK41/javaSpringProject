@@ -12,7 +12,7 @@ public abstract class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
-    private String name;
+    protected String name;
     private String password;
     private String email;
 }

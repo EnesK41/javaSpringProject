@@ -46,16 +46,20 @@ public class UserService {
     }
 
     /*public void likeNews(User user, News news){
-        e
+        
     }*/
 
     public void bookmarkNews(User user, News news){
-        List<News> bookmarks = user.getBookmarks();
-        if(bookmarks == null){
-            bookmarks = new ArrayList<>();
-            user.setBookmarks(bookmarks);
-        }
-        bookmarks.add(news);
+        if(user.getBookmarks() != null){
+            user.setBookmarks(new ArrayList<>());
+        }    
+        user.getBookmarks().add(news);
         userRepository.save(user);
+    }
+
+    public void deleteNews(News news){
+        for(User user : userRepository.findAll()){
+            if(user.getBookmarks.)
+        }
     }
 }

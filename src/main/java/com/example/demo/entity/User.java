@@ -14,8 +14,12 @@ public class User extends Account{
     private String country;
     private String city;
     private String category;
-    @OneToMany(mappedBy = "user")
+    @ManyToMany
+    @JoinTable(
+        name = "user_bookmarks",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "news_id")
+    )
     private List<News> bookmarks;
-    public Object getBookmarks; 
 
 }

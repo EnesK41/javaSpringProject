@@ -37,11 +37,21 @@ public class NewsService {  //Services are singleton that means there is only on
         return newsRepository.findByCountry(publisher);
     }
 
+    public void addNews(News news){
+        newsRepository.save(news);
+    }
+
+    public void deleteNews(News news){
+        newsRepository.delete(news);
+    }
+
     public void openNews(News news, User user){
         news.setViews(news.getViews()+1);
         newsRepository.save(news);
 
         userService.openNews(user,news);
     }
+
+    /*public void likeNews(News news, User user){}*/
 
 }

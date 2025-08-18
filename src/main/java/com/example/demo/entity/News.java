@@ -18,6 +18,11 @@ public class News {
     private Publisher publisher;
     private String url;
     private long views;
+    //Emotes
+    private long angry;
+    private long happy;
+    private long sad;
+    private long like;
 }
 
 
