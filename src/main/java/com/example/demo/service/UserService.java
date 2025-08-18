@@ -57,9 +57,9 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteNews(News news){
+    /*public void deleteNews(News news){
         for(User user : userRepository.findAll()){
             if(user.getBookmarks.)
         }
-    }
+    }*/
 }
