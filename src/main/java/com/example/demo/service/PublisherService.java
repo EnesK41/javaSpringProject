@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,18 +39,22 @@ public class PublisherService {
         return publisherRepository.findAll();
     }
 
-    public void publishNews(Publisher publisher, News news){
-        if(publisher.getNews() == null){
-            publisher.setNews(new ArrayList<>());
-        }
+    public void publishNews(Long publisherId, News news){
+        Publisher publisher = publisherRepository.findById(publisherId).orElseThrow();
+
         publisher.getNews().add(news);
-        news.setPublisher(publisher);
         publisherRepository.save(publisher);
+        newsService.addNews(news);
+
     }
 
-    public void deleteNews(Publisher publisher, News news){ // Done for now,testing
+    public void deleteNews(Long publisherId, Long newsId){ // Done for now,testing
+        Publisher publisher = publisherRepository.findById(publisherId).orElseThrow();
+                    
+        News news = newsService.findById(newsId);
         publisher.getNews().remove(news);
         publisherRepository.save(publisher);
+
         newsService.deleteNews(news);
     }
 }

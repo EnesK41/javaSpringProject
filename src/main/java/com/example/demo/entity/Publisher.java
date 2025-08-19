@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
-import java.util.List;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -12,5 +13,5 @@ import lombok.EqualsAndHashCode;
 public class Publisher extends Account {
     private long points;
     @OneToMany(mappedBy = "publisher")
-    private List<News> news;
+    private Set<News> news;
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.News;
-import com.example.demo.entity.User;
+import com.example.demo.entity.Publisher;
 import com.example.demo.repository.NewsRepository;
 
 @Service
@@ -30,26 +30,40 @@ public class NewsService {  //Services are singleton that means there is only on
     }
 
     public List<News> findByCity(String city){
-        return newsRepository.findByCountry(city);
+        return newsRepository.findByCity(city);
     }
 
-    public List<News> findByPublisher(String publisher){
-        return newsRepository.findByCountry(publisher);
+    public List<News> findByPublisher(Publisher publisher){
+        return newsRepository.findByPublisher(publisher);
     }
 
-    public void addNews(News news){
+    public void addNews(News news){ //Could rename it : save - but might be confusing with jpa functionality
         newsRepository.save(news);
     }
 
-    public void deleteNews(News news){
+    public void deleteNews(News news){  //Rename it : delete
+        userService.removeNewsFromBookmarks(news);
         newsRepository.delete(news);
+        
     }
 
-    public void openNews(News news, User user){
-        news.setViews(news.getViews()+1);
+    public void incrementViews(Long newsId, Long userId){ //When someone reads the news
+        // Fetch the news
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new RuntimeException("News not found"));
+        
+        // Increment views
+        news.setViews(news.getViews() + 1);
         newsRepository.save(news);
 
-        userService.openNews(user,news);
+        // Delegate user points update to UserService
+        if (userId != null) {
+            userService.incrementPoint(userId);
+        }
+    }
+
+    public News findById(Long newsId){
+        return newsRepository.getReferenceById(newsId);
     }
 
     /*public void likeNews(News news, User user){}*/

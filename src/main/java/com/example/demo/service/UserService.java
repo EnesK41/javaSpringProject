@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,14 +13,16 @@ import com.example.demo.repository.UserRepository;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final NewsService newsService;
 
     //@Autowired - If more than one constructor use autowired   
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, NewsService newsService) {
         this.userRepository = userRepository;
+        this.newsService = newsService;
     }
 
     public void saveUser(User user){
-        if(userRepository.findByEmail(user.getEmail()) != null){
+        if(!userRepository.findByEmail(user.getEmail()).isEmpty()){
             return; //Will update
         }
         userRepository.save(user);
@@ -41,25 +42,39 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void openNews(User user, News news){
-        user.setPoints(user.getPoints()+1);
+    public void incrementPoint(Long userId){    //When you open the news
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPoints(user.getPoints() + 1);
+        userRepository.save(user);
     }
 
     /*public void likeNews(User user, News news){
         
     }*/
 
-    public void bookmarkNews(User user, News news){
-        if(user.getBookmarks() != null){
-            user.setBookmarks(new ArrayList<>());
-        }    
+    public void addBookmark(Long userId, Long newsId){//Later itcanbe called from newsService to show num of bookmarks
+        User user = userRepository.findById(userId).get();
+        News news = newsService.findById(newsId);
         user.getBookmarks().add(news);
         userRepository.save(user);
     }
 
-    /*public void deleteNews(News news){
-        for(User user : userRepository.findAll()){
-            if(user.getBookmarks.)
+    public void removeBookmark(Long userId, Long newsId){
+        User user = userRepository.getReferenceById(userId);
+        News news = new News();
+        news = newsService.findById(newsId);
+        user.getBookmarks().remove(news);
+        userRepository.save(user);
+    }
+
+    public void removeNewsFromBookmarks(News news){
+        List<User> users = userRepository.findAllByBookmarks_Id(news.getId());
+
+        for (User user : users) {
+            user.getBookmarks().remove(news);
         }
-    }*/
+        userRepository.saveAll(users);
+    }
+
 }

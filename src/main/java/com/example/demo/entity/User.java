@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -20,6 +22,6 @@ public class User extends Account{
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "news_id")
     )
-    private List<News> bookmarks;
+    private Set<News> bookmarks = new HashSet<>();
 
 }
