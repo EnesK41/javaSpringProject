@@ -12,17 +12,19 @@ public class News {
     private String title;
     private String content;
     private String country;
+    private String category;
     private String city;
     @ManyToOne
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
     private String url;
-    private long views;
-    //Emotes
+    private long views = 0;
+    /*//Emotes
     private long angry;
     private long happy;
     private long sad;
     private long like;
+    */
 }
 
 

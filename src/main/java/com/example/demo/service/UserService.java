@@ -3,7 +3,7 @@ package com.example.demo.service;
 import java.util.List;
 import java.util.Optional;
 
-//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.News;
@@ -12,25 +12,20 @@ import com.example.demo.repository.UserRepository;
 
 @Service
 public class UserService {
+
+
     private final UserRepository userRepository;
     private final NewsService newsService;
 
     //@Autowired - If more than one constructor use autowired   
-    public UserService(UserRepository userRepository, NewsService newsService) {
+    public UserService(UserRepository userRepository,@Lazy NewsService newsService) {
         this.userRepository = userRepository;
         this.newsService = newsService;
     }
 
-    public void saveUser(User user){
-        if(!userRepository.findByEmail(user.getEmail()).isEmpty()){
-            return; //Will update
-        }
-        userRepository.save(user);
-    }
-
     public void deleteUser(Long id){
         userRepository.deleteById(id);
-    }
+    } 
 
     //public void updateUser();
 
