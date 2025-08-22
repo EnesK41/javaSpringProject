@@ -7,69 +7,61 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.News;
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.entity.UserProfile;
+import com.example.demo.repository.UserProfileRepository;
 
 @Service
 public class UserService {
 
-
-    private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final NewsService newsService;
 
-    //@Autowired - If more than one constructor use autowired   
-    public UserService(UserRepository userRepository,@Lazy NewsService newsService) {
-        this.userRepository = userRepository;
+    public UserService(UserProfileRepository userProfileRepository, @Lazy NewsService newsService) {
+        this.userProfileRepository = userProfileRepository;
         this.newsService = newsService;
     }
 
     public void deleteUser(Long id){
-        userRepository.deleteById(id);
-    } 
-
-    //public void updateUser();
-
-    public Optional<User> findUserByEmail(String email){
-        return userRepository.findByEmail(email);
+        userProfileRepository.deleteById(id);
     }
 
-    public List<User> allUsers(){
-        return userRepository.findAll();
+    public Optional<UserProfile> findUserByEmail(String email){
+        return userProfileRepository.findByAccount_Email(email);
     }
 
-    public void incrementPoint(Long userId){    //When you open the news
-        User user = userRepository.findById(userId)
+    public List<UserProfile> allUsers(){
+        return userProfileRepository.findAll();
+    }
+
+    public void incrementPoint(Long userId){
+        UserProfile user = userProfileRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         user.setPoints(user.getPoints() + 1);
-        userRepository.save(user);
+        userProfileRepository.save(user);
     }
 
-    /*public void likeNews(User user, News news){
-        
-    }*/
-
-    public void addBookmark(Long userId, Long newsId){//Later itcanbe called from newsService to show num of bookmarks
-        User user = userRepository.findById(userId).get();
+    public void addBookmark(Long userId, Long newsId){
+        UserProfile user = userProfileRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
         News news = newsService.findById(newsId);
         user.getBookmarks().add(news);
-        userRepository.save(user);
+        userProfileRepository.save(user);
     }
 
     public void removeBookmark(Long userId, Long newsId){
-        User user = userRepository.getReferenceById(userId);
-        News news = new News();
-        news = newsService.findById(newsId);
+        UserProfile user = userProfileRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        News news = newsService.findById(newsId);
         user.getBookmarks().remove(news);
-        userRepository.save(user);
+        userProfileRepository.save(user);
     }
 
     public void removeNewsFromBookmarks(News news){
-        List<User> users = userRepository.findAllByBookmarks_Id(news.getId());
+        List<UserProfile> users = userProfileRepository.findAllByBookmarks_Id(news.getId());
 
-        for (User user : users) {
+        for (UserProfile user : users) {
             user.getBookmarks().remove(news);
         }
-        userRepository.saveAll(users);
+        userProfileRepository.saveAll(users);
     }
-
 }

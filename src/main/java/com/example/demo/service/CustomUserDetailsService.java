@@ -1,41 +1,26 @@
 package com.example.demo.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
-
+import com.example.demo.entity.Account;
 import com.example.demo.entity.CustomUserDetails;
-import com.example.demo.repository.*;
-
+import com.example.demo.repository.AccountRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final PublisherRepository publisherRepository;
-    private final AdminRepository adminRepository;
+    private final AccountRepository accountRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository,
-                                    PublisherRepository publisherRepository,
-                                    AdminRepository adminRepository) {
-        this.userRepository = userRepository;
-        this.publisherRepository = publisherRepository;
-        this.adminRepository = adminRepository;
+    public CustomUserDetailsService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Account account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        System.out.println("[DEBUG] Loaded account: " + email + " with password hash: " + account.getPassword());
 
-        if (adminRepository.findByEmail(email).isPresent()) {
-            return new CustomUserDetails(adminRepository.findByEmail(email).get());
-        } else if (publisherRepository.findByEmail(email).isPresent()) {
-            return new CustomUserDetails(publisherRepository.findByEmail(email).get());
-        } else if (userRepository.findByEmail(email).isPresent()) {
-            return new CustomUserDetails(userRepository.findByEmail(email).get());
-        } else {
-            throw new UsernameNotFoundException("User not found");
-        }
+        return new CustomUserDetails(account);
     }
 }
-

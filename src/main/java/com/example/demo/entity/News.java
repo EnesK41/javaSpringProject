@@ -9,22 +9,20 @@ public class News {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String title;
     private String content;
     private String country;
     private String category;
     private String city;
+    private String url;
+
+    private long views = 0;
+
     @ManyToOne
     @JoinColumn(name = "publisher_id")
-    private Publisher publisher;
-    private String url;
-    private long views = 0;
-    /*//Emotes
-    private long angry;
-    private long happy;
-    private long sad;
-    private long like;
-    */
+    private PublisherProfile publisher; // ✅ instead of Publisher
 }
+
 
 

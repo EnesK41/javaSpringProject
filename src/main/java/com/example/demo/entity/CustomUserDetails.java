@@ -10,42 +10,46 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class CustomUserDetails implements UserDetails {
     private final Account account;
 
-
-    public CustomUserDetails(Account account){
+    public CustomUserDetails(Account account) {
         this.account = account;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities(){
-        if(account instanceof Admin){
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        }else if(account instanceof Publisher){
-            return List.of(new SimpleGrantedAuthority("ROLE_PUBLISHER"));
-        }else{
-            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        }
-
+    public Account getAccount() {
+        return account;
     }
 
     @Override
-    public String getPassword(){
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + account.getRole().name()));
+    }
+
+    @Override
+    public String getPassword() {
         return account.getPassword();
     }
 
     @Override
-    public String getUsername(){
-        return account.getName();
+    public String getUsername() {
+        return account.getEmail();
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isEnabled() { return true; }
+    public boolean isEnabled() {
+        return true;
+    }
 }
