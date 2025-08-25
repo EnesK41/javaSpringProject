@@ -12,11 +12,14 @@ API.interceptors.request.use(config => {
 });
 
 // Login function (send email)
-export const login = (email, password) =>
-  API.post("/auth/login", { email, password });
-
+export const login = (email, password) => {
+  console.log("[DEBUG] Sending login request:", email);
+  return API.post("/auth/login", { email, password });
+};
 // Register function
-export const register = ({ name, email, password, role }) =>
-  API.post("/auth/register", { name, email, password, role });
+export const register = ({ name, email, password, role }) => {
+  console.log("[DEBUG] Sending register request:", name, email, role);
+  return API.post("/auth/register", { name, email, password, role });
+};
 
 export default API;

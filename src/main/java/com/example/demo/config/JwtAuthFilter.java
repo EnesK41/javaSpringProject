@@ -25,16 +25,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
+    // --- ADDED THIS METHOD ---
+    // This method ensures that the JWT filter does NOT run for authentication endpoints.
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        // We only want to filter requests that are not for authentication (login/register)
+        return request.getServletPath().startsWith("/auth");
+    }
+    // -------------------------
+
     @SuppressWarnings("null")
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        // If shouldNotFilter returns true, this doFilterInternal method won't even be called for those paths.
+        // However, the original code remains valid for requests that *should* be filtered.
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            Claims claims = jwtConfig.parseToken(token);
+            Claims claims = jwtConfig.parseToken(token); // Make sure parseToken handles invalid tokens gracefully (e.g., throws an exception caught by a handler)
             String username = claims.getSubject();
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
