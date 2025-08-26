@@ -1,14 +1,15 @@
 package com.example.demo.service;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-
+import com.example.demo.dto.GetPublisherInfoDTO;
 import com.example.demo.entity.News;
 import com.example.demo.entity.PublisherProfile;
 import com.example.demo.repository.PublisherProfileRepository;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // Import this
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PublisherService {
@@ -20,6 +21,24 @@ public class PublisherService {
         this.publisherProfileRepository = publisherProfileRepository;
         this.newsService = newsService;
     }
+
+    // --- THIS IS THE NEW METHOD ---
+    // All the logic from the controller is now here.
+    @Transactional(readOnly = true) // Use readOnly for performance on GET requests
+    public GetPublisherInfoDTO getPublisherInfo(Long accountId) {
+        PublisherProfile publisher = publisherProfileRepository.findByAccount_Id(accountId)
+            .orElseThrow(() -> new RuntimeException("Publisher not found for account ID: " + accountId)); // Or a custom not-found exception
+
+        // The business logic of creating the DTO is now correctly in the service.
+        return new GetPublisherInfoDTO(
+            publisher.getId(),
+            publisher.getAccount().getName(),
+            publisher.getPoints(),
+            publisher.getNews().size()
+        );
+    }
+    // -----------------------------
+
 
     public void savePublisher(PublisherProfile publisher){
         publisherProfileRepository.save(publisher);
@@ -37,24 +56,26 @@ public class PublisherService {
         return publisherProfileRepository.findAll();
     }
 
+    @Transactional // Add this to ensure data consistency
     public void publishNews(Long publisherId, News news){
         PublisherProfile publisher = publisherProfileRepository.findById(publisherId)
-                .orElseThrow(() -> new RuntimeException("Publisher not found"));
+            .orElseThrow(() -> new RuntimeException("Publisher not found"));
 
         publisher.getNews().add(news);
-        publisherProfileRepository.save(publisher);
+        // You don't need to save the publisher here; the transaction will handle it.
 
         news.setPublisher(publisher);
         newsService.addNews(news);
     }
 
+    @Transactional // Add this to ensure data consistency
     public void deleteNews(Long publisherId, Long newsId){
         PublisherProfile publisher = publisherProfileRepository.findById(publisherId)
-                .orElseThrow(() -> new RuntimeException("Publisher not found"));
+            .orElseThrow(() -> new RuntimeException("Publisher not found"));
 
         News news = newsService.findById(newsId);
         publisher.getNews().remove(news);
-        publisherProfileRepository.save(publisher);
+        // You don't need to save the publisher here; the transaction will handle it.
 
         newsService.deleteNews(news);
     }

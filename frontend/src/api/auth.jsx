@@ -22,4 +22,9 @@ export const register = ({ name, email, password, role }) => {
   return API.post("/auth/register", { name, email, password, role });
 };
 
+export const getPublisherInfo = (id) => {
+  console.log("[DEBUG] Sending getPublisherInfo request:", id);
+  return API.get(`/publisher/${id}/info`);
+};
+
 export default API;

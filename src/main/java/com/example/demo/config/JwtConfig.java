@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.SecretKey;
@@ -28,10 +29,11 @@ public class JwtConfig {
     }
 
     public String generateToken(Account account) {
-        Map<String, Object> claims = Map.of(
-            "role", account.getRole().name()
-        );
-        return generateToken(account.getName(), claims);
+        Map<String, Object> claims = new HashMap<>(Map.of(
+        "role", account.getRole().name()
+        ));
+        claims.put("userId", account.getId()); 
+        return generateToken(account.getEmail(), claims);
     }
 
     public String generateToken(String username, Map<String, Object> extraClaims) {
