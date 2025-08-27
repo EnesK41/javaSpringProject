@@ -6,7 +6,7 @@ import com.example.demo.entity.PublisherProfile;
 import com.example.demo.repository.PublisherProfileRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Import this
+import org.springframework.transaction.annotation.Transactional; 
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +22,8 @@ public class PublisherService {
         this.newsService = newsService;
     }
 
-    // --- THIS IS THE NEW METHOD ---
-    // All the logic from the controller is now here.
-    @Transactional(readOnly = true) // Use readOnly for performance on GET requests
+
+    @Transactional(readOnly = true) 
     public GetPublisherInfoDTO getPublisherInfo(Long accountId) {
         PublisherProfile publisher = publisherProfileRepository.findByAccount_Id(accountId)
             .orElseThrow(() -> new RuntimeException("Publisher not found for account ID: " + accountId)); // Or a custom not-found exception

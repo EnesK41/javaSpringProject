@@ -27,4 +27,10 @@ export const getPublisherInfo = (id) => {
   return API.get(`/publisher/${id}/info`);
 };
 
+export const getUserInfo = (id) => {
+  console.log("[DEBUG] Sending getUserInfo request:", id);
+  return API.get(`/user/${id}/info`);
+};
+
+
 export default API;

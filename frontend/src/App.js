@@ -6,14 +6,14 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import PublisherInfo from "./components/Publisher-Info";
+import UserInfo from "./components/User-Info";
 
-import { register, login, getPublisherInfo } from "./api/auth";
+import { register, login, getPublisherInfo, getUserInfo } from "./api/auth";
 
 function App() {
   const [user, setUser] = useState(null);
   
 
-  // 2. ADD THIS useEffect HOOK.
   // This hook runs only once when the application first loads.
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -36,7 +36,6 @@ function App() {
             role: payload.role,
           });
         } else {
-          // If token is expired, remove it
           localStorage.removeItem("token");
         }
       } catch (error) {
@@ -56,6 +55,7 @@ function App() {
         <Route path="/login" element={<Login login={login} setUser={setUser} />} />
         <Route path="/register" element={<Register register={register} setUser={setUser} />} />
         <Route path="/publisher/:id/info" element={<PublisherInfo user={user} getPublisherInfo={getPublisherInfo} />} />
+        <Route path="/user/:id/info" element={<UserInfo user={user} getUserInfo={getUserInfo} />} />
         {/* Add UserNews, PublisherNews later */}
       </Routes>
     </Router>

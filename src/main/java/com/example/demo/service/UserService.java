@@ -6,9 +6,12 @@ import java.util.Optional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.GetUserInfoDTO;
 import com.example.demo.entity.News;
 import com.example.demo.entity.UserProfile;
 import com.example.demo.repository.UserProfileRepository;
+
+import org.springframework.transaction.annotation.Transactional; 
 
 @Service
 public class UserService {
@@ -63,5 +66,16 @@ public class UserService {
             user.getBookmarks().remove(news);
         }
         userProfileRepository.saveAll(users);
+    }
+
+    @Transactional(readOnly = true)
+    public GetUserInfoDTO getUserInfo(long accountId){
+        UserProfile user = userProfileRepository.findById(accountId)
+        .orElseThrow(() -> new RuntimeException("User not found for account ID: " + accountId));
+        return new GetUserInfoDTO(
+            user.getId(),
+            user.getAccount().getName(),
+            user.getPoints()
+        );
     }
 }

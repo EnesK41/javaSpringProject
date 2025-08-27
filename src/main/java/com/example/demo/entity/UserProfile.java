@@ -19,7 +19,7 @@ public class UserProfile {
     @JoinColumn(name = "id")
     private Account account;
 
-    private long points;
+    private int points;
     private String country;
     private String city;
     private String category;

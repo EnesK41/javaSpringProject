@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Home, LogOut, User as UserIcon, LayoutDashboard, FileText } from 'lucide-react';
+import { Home, LogOut, User as UserIcon, LayoutDashboard, UserCircle } from 'lucide-react';
 
 const Navbar = ({ user, setUser }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -44,8 +44,9 @@ const Navbar = ({ user, setUser }) => {
           </div>
           {/* Role-specific links */}
           {user.role === "USER" && (
-            <Link to="/user-news" onClick={() => setIsDropdownOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-              <FileText className="w-4 h-4 mr-3" /> My News
+            // FIX: Added a "My Profile" link for users with the USER role.
+            <Link to={`/user/${user.id}/info`} onClick={() => setIsDropdownOpen(false)} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <UserCircle className="w-4 h-4 mr-3" /> My Profile
             </Link>
           )}
           {user.role === "PUBLISHER" && (
