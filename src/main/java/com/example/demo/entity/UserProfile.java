@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class UserProfile {
     @Id
-    private Long id; // same as Account.id
+    private Long id; 
 
     @OneToOne
     @MapsId

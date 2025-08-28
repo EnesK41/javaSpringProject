@@ -21,8 +21,5 @@ public class News {
 
     @ManyToOne
     @JoinColumn(name = "publisher_id")
-    private PublisherProfile publisher; // ✅ instead of Publisher
+    private PublisherProfile publisher;
 }
-
-
-

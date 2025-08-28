@@ -22,14 +22,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-    // These are the dependencies you actually need for this controller.
     private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
     private final AuthService authService;
     private final AccountRepository accountRepository;
 
-    // The constructor is now cleaner, with unused dependencies removed.
     public AuthController(AuthenticationManager authenticationManager,
                           JwtConfig jwtConfig,
                           AuthService authService,
@@ -57,8 +54,6 @@ public class AuthController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            // This now correctly catches the custom "EmailAlreadyExistsException"
-            // and returns its specific message.
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
@@ -66,26 +61,20 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO request) {
         try {
-            // Let Spring Security handle the authentication
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
-            // Find the full account details to generate the token
             Account account = accountRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("User not found after successful authentication."));
 
-            // Generate the token
             String token = jwtConfig.generateToken(account);
 
-            // Return the token in the response
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
             return ResponseEntity.ok(response);
 
         } catch (AuthenticationException e) {
-            // THE FIX: We now specifically catch AuthenticationException.
-            // This is the correct exception for bad credentials and prevents a 500 error.
             return ResponseEntity.status(401).body("Invalid email or password");
         }
     }

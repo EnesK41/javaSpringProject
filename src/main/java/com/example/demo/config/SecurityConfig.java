@@ -39,6 +39,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/h2-console/**").permitAll()
+                .requestMatchers("/api/news/**").permitAll()
                 .requestMatchers("/publisher/**").hasRole("PUBLISHER")
                 .requestMatchers("/user/**").hasRole("USER")
                 .anyRequest().authenticated()

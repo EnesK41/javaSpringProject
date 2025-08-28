@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-
 @Entity
 @Data
 @Table(name = "account")
@@ -25,7 +24,7 @@ public class Account {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Role role; // USER, PUBLISHER, ADMIN
+    private Role role; 
 
     public enum Role { USER, PUBLISHER, ADMIN }
 }

@@ -20,5 +20,4 @@ public class AdminProfile {
     @JoinColumn(name = "id")
     private Account account;
 
-    // Admin-specific fields if needed
 }

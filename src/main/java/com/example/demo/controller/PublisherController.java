@@ -1,19 +1,26 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.GetPublisherInfoDTO;
+import com.example.demo.dto.NewsDTO;
+import com.example.demo.dto.PublishNewsDTO;
+import com.example.demo.entity.CustomUserDetails;
 import com.example.demo.service.PublisherService; // Import the service
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/publisher")
 public class PublisherController {
-
-    // THE FIX: Inject the service (the "chef"), not the repository.
     private final PublisherService publisherService;
 
     public PublisherController(PublisherService publisherService){
@@ -25,5 +32,25 @@ public class PublisherController {
     public ResponseEntity<GetPublisherInfoDTO> getPublisherInfo(@PathVariable Long id){
         GetPublisherInfoDTO dto = publisherService.getPublisherInfo(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/publish")
+    @PreAuthorize("hasRole('PUBLISHER')")
+    public ResponseEntity<NewsDTO> publishNews(@RequestBody PublishNewsDTO dto, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long accountId = userDetails.getAccount().getId();
+
+        NewsDTO createdNews = publisherService.publishNews(accountId, dto);
+
+        return new ResponseEntity<>(createdNews, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/news/{newsId}")
+    @PreAuthorize("hasRole('PUBLISHER') || hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteNews(@PathVariable Long id, Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
+        Long accountId = userDetails.getAccount().getId();
+        publisherService.deleteNews(id,accountId, userDetails.getAuthorities());
+        return ResponseEntity.noContent().build();
     }
 }
