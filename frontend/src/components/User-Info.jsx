@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// The API function is now passed as a prop, so this direct import is not needed.
-// import { getUserInfo } from '../api/auth'; 
 import { User, Award } from 'lucide-react';
 
 const UserInfo = ({ user, getUserInfo }) => {
   const { id } = useParams();
-  // FIX #1: Rename the state variable from 'user' to 'userInfo' to avoid conflicts.
+  
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      // This check correctly uses the 'user' prop (the logged-in user).
+      
       if (!user) {
         return;
       }
 
       setLoading(true);
       try {
-        // The 'getUserInfo' function is now correctly received as a prop.
+        
         const response = await getUserInfo(id);
-        // FIX #2: Call the renamed state setter function.
+        
         setUserInfo(response.data);
       } catch (err) {
         console.error("Failed to fetch user details:", err);
@@ -39,11 +37,11 @@ const UserInfo = ({ user, getUserInfo }) => {
     };
 
     fetchUserDetails();
-  }, [id, user, getUserInfo]); // The dependency array is correct.
+  }, [id, user, getUserInfo]); 
 
-  if (loading && !userInfo) { // Adjusted loading condition
+  if (loading && !userInfo) { 
     return (
-      <div className="flex items-center justify-center p-8 mt-12">
+      <div className="flex items-center justify-center p-8 mt-12 pt-20">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
         <p className="ml-4 text-gray-700 text-lg">Loading user data...</p>
       </div>
@@ -51,7 +49,7 @@ const UserInfo = ({ user, getUserInfo }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-inter antialiased">
+    <div className="min-h-screen bg-gray-50 font-inter antialiased pt-20">
       <div className="container mx-auto p-6 md:p-10">
         <div className="bg-white shadow-xl rounded-2xl max-w-md mx-auto mt-12 p-8 border border-gray-200">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center border-b pb-4">
@@ -67,7 +65,7 @@ const UserInfo = ({ user, getUserInfo }) => {
 
           {!error && userInfo && (
             <div className="space-y-5">
-              {/* FIX #3: Use the 'userInfo' state variable to display data. */}
+              
               <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm">
                 <User className="w-8 h-8 text-indigo-600" />
                 <div>
