@@ -36,7 +36,7 @@ public class NewsService {
                 .orElseThrow(() -> new RuntimeException("News not found with ID: " + newsId));
         news.setViews(news.getViews() + 1);
 
-        UserProfile viewingUser = userProfileRepository.findById(viewingUserAccountId)
+        UserProfile viewingUser = userProfileRepository.findByAccount_Id(viewingUserAccountId)
                 .orElseThrow(() -> new RuntimeException("Viewing user not found with Account ID: " + viewingUserAccountId));
         viewingUser.setPoints(viewingUser.getPoints() + 1);
 

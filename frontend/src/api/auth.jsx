@@ -45,7 +45,7 @@ export const deleteNews = (newsId) => {
 };
 
 export const getLocalNews = (page = 0, size = 10) => {
-    return API.get(`/api/local-news?page=${page}&size=${size}`);
+    return API.get(`/local-news?page=${page}&size=${size}`);
 }
 
 export const getNewsByPublisher = (publisherId) => {

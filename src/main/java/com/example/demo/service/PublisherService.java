@@ -72,10 +72,11 @@ public class PublisherService {
         news.setPublisher(publisher);
         news.setViews(0);
         
+        // FIX: Generate the slug and set the URL *before* saving.
         String slug = slugify.slugify(dto.getTitle());
         news.setUrl("/dispatch/" + slug);
 
-        // FIX: The service now saves directly to the NewsRepository.
+        // FIX: Save the entity only once.
         News savedNews = newsRepository.save(news);
         return new NewsDTO(savedNews);
     }
@@ -93,12 +94,8 @@ public class PublisherService {
             throw new AccessDeniedException("You do not have permission to delete this article.");
         }
 
-        // FIX: This service now coordinates the entire deletion process.
-        // 1. It tells the UserService to clean up bookmarks.
         userService.removeNewsFromBookmarks(news);
-        // 2. It directly deletes the news article.
+        // FIX: The service now deletes directly from the NewsRepository.
         newsRepository.delete(news);
     }
-    
-    // Unused methods from your original file have been removed for clarity.
 }

@@ -19,7 +19,7 @@ import com.example.demo.service.NewsService;
 import org.springframework.security.core.Authentication;
 
 @RestController
-@RequestMapping("/news")
+@RequestMapping("/local-news")
 public class NewsController {
     private final NewsService newsService;
 
@@ -37,19 +37,15 @@ public class NewsController {
     }
 
     @PostMapping("/{id}/view")
-    // FIX: Changed to isAuthenticated() so any logged-in user (USER or PUBLISHER) can trigger this.
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> recordNewsView(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> openNews(@PathVariable Long id, Authentication authentication) {
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         Long userId = user.getAccount().getId();
 
         try {
-            // Calling your existing service method
             newsService.openNews(id, userId);
-            // Return a clear success message to the frontend
             return ResponseEntity.ok(Map.of("message", "View recorded and points awarded."));
         } catch (Exception e) {
-            // Return a clear error message if something goes wrong
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }

@@ -43,23 +43,20 @@ public class ApiNewsService {
 
     @Transactional
     public Page<ApiNewsDTO> getNews(String query, String country, int page, int size) {
-        // Create a unique key for the cache based on the filter criteria.
         String cacheKey = query + ":" + country;
-
-        // Get the last fetch time for this specific query, or a very old date if it's not in the cache.
         LocalDateTime lastFetch = queryCacheTimestamps.getOrDefault(cacheKey, LocalDateTime.MIN);
 
-        // Check if the cache for this specific query is stale (older than 1 hour).
         if (lastFetch.isBefore(LocalDateTime.now().minusHours(1))) {
-            // If stale, fetch new data from the API using the filters.
             fetchAndStoreFromBraveApi(query, country);
-            // Update the cache timestamp for this specific query.
             queryCacheTimestamps.put(cacheKey, LocalDateTime.now());
         }
 
-        // Now, serve the requested page from our database.
         Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
-        return apiNewsRepository.findAll(pageable).map(ApiNewsDTO::new);
+        
+        // --- THE FIX ---
+        // Instead of findAll(), we now use our new, more specific query method.
+        // This ensures the results match the user's search term.
+        return apiNewsRepository.findByQuery(query, pageable).map(ApiNewsDTO::new);
     }
 
     // This method is private as it's only called by the main getNews method.

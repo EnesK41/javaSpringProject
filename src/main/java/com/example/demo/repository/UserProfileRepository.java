@@ -12,4 +12,5 @@ import com.example.demo.entity.UserProfile;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
     List<UserProfile> findAllByBookmarks_Id(Long newsId);
     Optional<UserProfile> findByAccount_Email(String email);
+    Optional<UserProfile> findByAccount_Id(Long viewingUserAccountId);
 }
