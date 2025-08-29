@@ -21,10 +21,14 @@ public class ApiNewsController {
 
     @GetMapping
     public ResponseEntity<Page<ApiNewsDTO>> getNews(
+            // The controller accepts the filter parameters...
+            @RequestParam(defaultValue = "latest headlines") String query,
+            @RequestParam(defaultValue = "us") String country,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "12") int size) {
         
-        Page<ApiNewsDTO> newsPage = apiNewsService.getNews(page, size);
+        // ...and passes them directly to the service.
+        Page<ApiNewsDTO> newsPage = apiNewsService.getNews(query, country, page, size);
         return ResponseEntity.ok(newsPage);
     }
 }
