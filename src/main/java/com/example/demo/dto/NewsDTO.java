@@ -26,6 +26,8 @@ public class NewsDTO {
         this.views = news.getViews();
         if (news.getPublisher() != null && news.getPublisher().getAccount() != null) {
             this.publisherName = news.getPublisher().getAccount().getName();
+        } else {
+            this.publisherName = "Unknown Author";
         }
     }
 }

@@ -1,18 +1,23 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.NewsDTO;
 import com.example.demo.entity.News;
 import com.example.demo.entity.PublisherProfile;
 import com.example.demo.entity.UserProfile;
 import com.example.demo.repository.NewsRepository;
 import com.example.demo.repository.PublisherProfileRepository;
 import com.example.demo.repository.UserProfileRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NewsService {
 
-    // FIX: Removed the UserService dependency.
     private final NewsRepository newsRepository;
     private final UserProfileRepository userProfileRepository;
     private final PublisherProfileRepository publisherProfileRepository;
@@ -43,6 +48,14 @@ public class NewsService {
 
         newsRepository.save(news);
         userProfileRepository.save(viewingUser);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NewsDTO> getAllLocalNews(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        return newsRepository.findAllWithPublisherAndAccount(pageable)
+                .map(NewsDTO::new);
     }
 
     public News findById(Long newsId) {
