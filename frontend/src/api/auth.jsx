@@ -32,8 +32,9 @@ export const getUserInfo = (id) => {
   return API.get(`/user/${id}/info`);
 };
 
-export const getNews = (page = 0, size = 10) => {
-  return API.get(`/api/news?page=${page}&size=${size}`);
+export const getNews = (query = 'latest headlines', country = 'us', page = 0, size = 10) => {
+  // The function now takes query and country and adds them to the request URL.
+  return API.get(`/api/news?query=${query}&country=${country}&page=${page}&size=${size}`);
 };
 
 export default API;
