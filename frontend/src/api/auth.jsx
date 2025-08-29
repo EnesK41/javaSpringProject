@@ -33,8 +33,23 @@ export const getUserInfo = (id) => {
 };
 
 export const getNews = (query = 'latest headlines', country = 'us', page = 0, size = 10) => {
-  // The function now takes query and country and adds them to the request URL.
   return API.get(`/api/news?query=${query}&country=${country}&page=${page}&size=${size}`);
 };
+
+export const createNews = (newsData) => {
+  return API.post("/publisher/news", newsData);
+};
+
+export const deleteNews = (newsId) => {
+  return API.delete(`/publisher/news/${newsId}`);
+};
+
+export const getLocalNews = (page = 0, size = 10) => {
+    return API.get(`/api/local-news?page=${page}&size=${size}`);
+}
+
+export const getNewsByPublisher = (publisherId) => {
+    return API.get(`/publisher/${publisherId}/news`); 
+}
 
 export default API;

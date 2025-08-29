@@ -3,12 +3,12 @@ package com.example.demo.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.GetUserInfoDTO;
 import com.example.demo.entity.News;
 import com.example.demo.entity.UserProfile;
+import com.example.demo.repository.NewsRepository;
 import com.example.demo.repository.UserProfileRepository;
 
 import org.springframework.transaction.annotation.Transactional; 
@@ -17,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserProfileRepository userProfileRepository;
-    private final NewsService newsService;
+    private final NewsRepository newsRepository; // <-- Change this
 
-    public UserService(UserProfileRepository userProfileRepository, @Lazy NewsService newsService) {
+    public UserService(UserProfileRepository userProfileRepository, NewsRepository newsRepository) { // <-- Change this
         this.userProfileRepository = userProfileRepository;
-        this.newsService = newsService;
-    }
+        this.newsRepository = newsRepository; // <-- Change this
+    }   
 
     public void deleteUser(Long id){
         userProfileRepository.deleteById(id);
@@ -43,39 +43,45 @@ public class UserService {
         userProfileRepository.save(user);
     }
 
-    public void addBookmark(Long userId, Long newsId){
-        UserProfile user = userProfileRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        News news = newsService.findById(newsId);
+    @Transactional
+    public void addBookmark(Long userAccountId, Long newsId) {
+        UserProfile user = userProfileRepository.findById(userAccountId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // FIX: Finds the news article directly from the repository.
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new RuntimeException("News not found"));
         user.getBookmarks().add(news);
         userProfileRepository.save(user);
     }
 
-    public void removeBookmark(Long userId, Long newsId){
-        UserProfile user = userProfileRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        News news = newsService.findById(newsId);
+    @Transactional
+    public void removeBookmark(Long userAccountId, Long newsId) {
+        UserProfile user = userProfileRepository.findById(userAccountId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        // FIX: Finds the news article directly from the repository.
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new RuntimeException("News not found"));
         user.getBookmarks().remove(news);
         userProfileRepository.save(user);
     }
 
-    public void removeNewsFromBookmarks(News news){
+    @Transactional
+    public void removeNewsFromBookmarks(News news) {
         List<UserProfile> users = userProfileRepository.findAllByBookmarks_Id(news.getId());
-
         for (UserProfile user : users) {
             user.getBookmarks().remove(news);
         }
         userProfileRepository.saveAll(users);
     }
-
+    
     @Transactional(readOnly = true)
     public GetUserInfoDTO getUserInfo(long accountId){
         UserProfile user = userProfileRepository.findById(accountId)
-        .orElseThrow(() -> new RuntimeException("User not found for account ID: " + accountId));
+                .orElseThrow(() -> new RuntimeException("User not found for account ID: " + accountId));
         return new GetUserInfoDTO(
-            user.getId(),
-            user.getAccount().getName(),
-            user.getPoints()
+                user.getId(),
+                user.getAccount().getName(),
+                user.getPoints()
         );
     }
 }

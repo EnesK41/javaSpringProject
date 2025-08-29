@@ -6,6 +6,8 @@ import com.example.demo.dto.PublishNewsDTO;
 import com.example.demo.entity.CustomUserDetails;
 import com.example.demo.service.PublisherService; // Import the service
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +36,14 @@ public class PublisherController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/publish")
+    @GetMapping("/{publisherId}/news")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<NewsDTO>> getNewsByPublisher(@PathVariable Long publisherId) {
+        List<NewsDTO> newsList = publisherService.getNewsByPublisher(publisherId);
+        return ResponseEntity.ok(newsList);
+    }
+
+    @PostMapping("/news")
     @PreAuthorize("hasRole('PUBLISHER')")
     public ResponseEntity<NewsDTO> publishNews(@RequestBody PublishNewsDTO dto, Authentication authentication){
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();

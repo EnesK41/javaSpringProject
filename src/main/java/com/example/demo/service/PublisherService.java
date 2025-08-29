@@ -2,12 +2,12 @@ package com.example.demo.service;
 
 import com.example.demo.dto.GetPublisherInfoDTO;
 import com.example.demo.dto.NewsDTO;
-import com.example.demo.dto.PublishNewsDTO;
+import com.example.demo.dto.PublishNewsDTO; // Assuming this is your DTO for creating news
 import com.example.demo.entity.News;
 import com.example.demo.entity.PublisherProfile;
 import com.example.demo.repository.NewsRepository;
 import com.example.demo.repository.PublisherProfileRepository;
-import org.springframework.context.annotation.Lazy;
+import com.github.slugify.Slugify;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -15,56 +15,53 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PublisherService {
 
     private final PublisherProfileRepository publisherProfileRepository;
-    private final NewsService newsService;
     private final NewsRepository newsRepository;
+    private final UserService userService;
+    private final Slugify slugify = Slugify.builder().build();
 
-    public PublisherService(PublisherProfileRepository publisherProfileRepository, @Lazy NewsService newsService, NewsRepository newsRepository) {
+    public PublisherService(PublisherProfileRepository publisherProfileRepository,
+                            NewsRepository newsRepository,
+                            UserService userService) {
         this.publisherProfileRepository = publisherProfileRepository;
-        this.newsService = newsService;
         this.newsRepository = newsRepository;
+        this.userService = userService;
     }
 
-
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public GetPublisherInfoDTO getPublisherInfo(Long accountId) {
         PublisherProfile publisher = publisherProfileRepository.findByAccount_Id(accountId)
-            .orElseThrow(() -> new RuntimeException("Publisher not found for account ID: " + accountId)); 
+                .orElseThrow(() -> new RuntimeException("Publisher not found for account ID: " + accountId));
+
+        int newsSize = newsRepository.findByPublisher(publisher).size();
 
         return new GetPublisherInfoDTO(
-            publisher.getId(),
-            publisher.getAccount().getName(),
-            publisher.getPoints(),
-            publisher.getNews().size()
+                publisher.getId(),
+                publisher.getAccount().getName(),
+                publisher.getPoints(),
+                newsSize
         );
     }
 
-
-    public void savePublisher(PublisherProfile publisher){
-        publisherProfileRepository.save(publisher);
+    @Transactional(readOnly = true)
+    public List<NewsDTO> getNewsByPublisher(Long publisherAccountId) {
+        PublisherProfile publisher = publisherProfileRepository.findByAccount_Id(publisherAccountId)
+                .orElseThrow(() -> new RuntimeException("Publisher not found for account ID: " + publisherAccountId));
+        
+        return newsRepository.findByPublisher(publisher).stream()
+                .map(NewsDTO::new)
+                .collect(Collectors.toList());
     }
 
-    public void deletePublisher(long id){
-        publisherProfileRepository.deleteById(id);
-    }
-
-    public Optional<PublisherProfile> findPublisherById(long id){
-        return publisherProfileRepository.findById(id);
-    }
-
-    public List<PublisherProfile> allPublishers(){
-        return publisherProfileRepository.findAll();
-    }
-
-    @Transactional // Add this to ensure data consistency
-    public NewsDTO publishNews(Long publisherId, PublishNewsDTO dto){
-        PublisherProfile publisher = publisherProfileRepository.findById(publisherId)
-            .orElseThrow(() -> new RuntimeException("Publisher not found"));
+    @Transactional
+    public NewsDTO publishNews(Long publisherAccountId, PublishNewsDTO dto) {
+        PublisherProfile publisher = publisherProfileRepository.findByAccount_Id(publisherAccountId)
+                .orElseThrow(() -> new RuntimeException("Publisher profile not found"));
 
         News news = new News();
         news.setTitle(dto.getTitle());
@@ -72,31 +69,36 @@ public class PublisherService {
         news.setCountry(dto.getCountry());
         news.setCategory(dto.getCategory());
         news.setCity(dto.getCity());
-
         news.setPublisher(publisher);
-        newsService.addNews(news);
-        news.setUrl("/news/" + System.currentTimeMillis()); 
         news.setViews(0);
-        news.setPublisher(publisher);
-        News savedNews = newsRepository.save(news);
+        
+        String slug = slugify.slugify(dto.getTitle());
+        news.setUrl("/dispatch/" + slug);
 
+        // FIX: The service now saves directly to the NewsRepository.
+        News savedNews = newsRepository.save(news);
         return new NewsDTO(savedNews);
     }
 
-    @Transactional 
-    public void deleteNews(Long newsId, Long publisherAccountId, Collection<? extends GrantedAuthority> authorities){
+    @Transactional
+    public void deleteNews(Long newsId, Long publisherAccountId, Collection<? extends GrantedAuthority> authorities) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new RuntimeException("News not found with ID: " + newsId));
 
         boolean isAdmin = authorities.stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
-        // 3. Security Check: Is the logged-in user the owner of the article OR are they an admin?
         Long ownerAccountId = news.getPublisher().getAccount().getId();
         if (!ownerAccountId.equals(publisherAccountId) && !isAdmin) {
             throw new AccessDeniedException("You do not have permission to delete this article.");
         }
 
-        newsService.deleteNews(news);
+        // FIX: This service now coordinates the entire deletion process.
+        // 1. It tells the UserService to clean up bookmarks.
+        userService.removeNewsFromBookmarks(news);
+        // 2. It directly deletes the news article.
+        newsRepository.delete(news);
     }
+    
+    // Unused methods from your original file have been removed for clarity.
 }

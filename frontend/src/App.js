@@ -7,6 +7,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import PublisherInfo from "./components/Publisher-Info";
 import UserInfo from "./components/User-Info";
+import CommunityNews from "./components/CommunityNews";
+import CreateNews from "./components/CreateNews";
 
 import { register, login, getPublisherInfo, getUserInfo } from "./api/auth";
 
@@ -56,7 +58,8 @@ function App() {
         <Route path="/register" element={<Register register={register} setUser={setUser} />} />
         <Route path="/publisher/:id/info" element={<PublisherInfo user={user} getPublisherInfo={getPublisherInfo} />} />
         <Route path="/user/:id/info" element={<UserInfo user={user} getUserInfo={getUserInfo} />} />
-        {/* Add UserNews, PublisherNews later */}
+        <Route path="/community-news" element={<CommunityNews />} />
+        <Route path="/publisher/create-news" element={<CreateNews />} />
       </Routes>
     </Router>
   );

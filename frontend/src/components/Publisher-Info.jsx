@@ -1,108 +1,120 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, User, DollarSign } from 'lucide-react';
+import { getPublisherInfo, getNewsByPublisher, deleteNews } from '../api/auth';
+import { Button, Modal } from 'flowbite-react'; // <-- Import Modal
+import { HiOutlineExclamationCircle } from 'react-icons/hi'; // <-- Import an icon for the modal
+import NewsCard from './NewsCard';
 
-const PublisherInfo = ({ user, getPublisherInfo }) => {
+const PublisherInfo = ({ user }) => {
   const { id } = useParams();
   const [publisher, setPublisher] = useState(null);
+  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    console.log("[Publisher-Info Effect] Effect is running. User is:", user);
+  // --- NEW: State for the delete confirmation modal ---
+  const [showModal, setShowModal] = useState(false);
+  const [articleToDelete, setArticleToDelete] = useState(null);
 
-    const fetchPublisherDetails = async () => {
-      if (!user) {
-        console.log("[Publisher-Info Effect] User is null, skipping API call.");
-
-        return;
-      }
-
+  const fetchPublisherData = useCallback(async () => {
+      if (!user) return;
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        setError(null);
-        const response = await getPublisherInfo(id);
-        console.log("[Publisher-Info Effect] User exists, attempting to fetch data...");
-
-        setPublisher(response.data);
+          const infoPromise = getPublisherInfo(id);
+          const articlesPromise = getNewsByPublisher(id);
+          const [infoResponse, articlesResponse] = await Promise.all([infoPromise, articlesPromise]);
+          setPublisher(infoResponse.data);
+          setArticles(articlesResponse.data);
       } catch (err) {
-        console.error("Failed to fetch publisher details:", err);
-        if (err.response && err.response.status === 404) {
-          setError(`Publisher with ID ${id} not found.`);
-        } else if (err.response && err.response.status === 403) {
-          setError("You don't have permission to view this publisher's details.");
-        } else {
-          setError("An unexpected error occurred while fetching publisher details.");
-        }
+          setError("Failed to fetch publisher data.");
+          console.error(err);
       } finally {
-        setLoading(false);
+          setLoading(false);
       }
-    };
+  }, [id, user]);
 
-    fetchPublisherDetails();
-  }, [id, user, getPublisherInfo]);
+  useEffect(() => {
+    fetchPublisherData();
+  }, [fetchPublisherData]);
 
+  // --- UPDATED: This function now just opens the modal ---
+  const handleDeleteClick = (article) => {
+    setArticleToDelete(article);
+    setShowModal(true);
+  };
+
+  // --- NEW: This function runs when the user confirms the deletion ---
+  const confirmDelete = async () => {
+    if (!articleToDelete) return;
+    try {
+        await deleteNews(articleToDelete.id);
+        setArticles(prevArticles => prevArticles.filter(article => article.id !== articleToDelete.id));
+    } catch (err) {
+        setError('Failed to delete the story. Please try again.'); // Set error state instead of alert
+        console.error(err);
+    } finally {
+        setShowModal(false);
+        setArticleToDelete(null);
+    }
+  };
+
+  if (loading) return <div className="text-center p-10 pt-24">Loading publisher data...</div>;
+  
   return (
-    <div className="min-h-screen bg-gray-100 font-inter antialiased">
-      <div className="container mx-auto p-6 md:p-10">
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden max-w-2xl mx-auto mt-12 p-8 border border-gray-200">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-6 text-center border-b pb-4">
-            Publisher Profile
-          </h1>
-
-          {loading && (
-            <div className="flex items-center justify-center p-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-              <p className="ml-4 text-gray-700 text-lg">Loading publisher data...</p>
-            </div>
+    <>
+      <div className="min-h-screen bg-gray-100 pt-24 font-inter">
+          {publisher && (
+               <div className="container mx-auto p-4 text-center">
+                  <h1 className="text-4xl font-bold">{publisher.name}'s Dashboard</h1>
+                  <p className="text-lg text-gray-600">Points: {publisher.points}</p>
+               </div>
           )}
 
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg relative text-center text-lg">
-              <strong className="font-bold">Error!</strong>
-              <span className="block sm:inline ml-2">{error}</span>
-            </div>
-          )}
+          <div className="container mx-auto p-4 text-center">
+               <Button as={Link} to="/publisher/create-news">Create New Story</Button>
+          </div>
 
-          {!loading && !error && publisher && (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-                <User className="w-8 h-8 text-indigo-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Name</p>
-                  <p className="text-xl font-semibold text-gray-800">{publisher.name}</p>
-                </div>
-              </div>
+          {error && <div className="text-center text-red-500 p-4">{error}</div>}
 
-              <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-                <DollarSign className="w-8 h-8 text-green-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Points</p>
-                  <p className="text-xl font-semibold text-gray-800">{publisher.points}</p>
-                </div>
+          <div className="container mx-auto p-4 sm:p-10">
+              <h2 className="text-3xl font-bold text-center my-8">My Stories</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {articles.map((article) => (
+                      <div key={article.id} className="relative">
+                          <NewsCard article={article} type="local" />
+                          {user && user.id === publisher?.account?.id && (
+                               <Button color="failure" size="xs" onClick={() => handleDeleteClick(article)} className="absolute top-4 left-4 z-20">
+                                  Delete
+                              </Button>
+                          )}
+                      </div>
+                  ))}
               </div>
-
-              <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg shadow-sm">
-                <BookOpen className="w-8 h-8 text-purple-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Articles Published</p>
-                  <p className="text-xl font-semibold text-gray-800">{publisher.newsCount}</p>
-                </div>
-              </div>
-
-              <div className="mt-10 pt-6 border-t flex justify-center">
-                <Link
-                  to={`/publisher/${publisher.id}/news`}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
-                >
-                  View All News by {publisher.name}
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
       </div>
-    </div>
+
+      {/* --- NEW: The Delete Confirmation Modal --- */}
+      <Modal show={showModal} size="md" onClose={() => setShowModal(false)} popup>
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this story titled "{articleToDelete?.title}"?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={confirmDelete}>
+                {"Yes, I'm sure"}
+              </Button>
+              <Button color="gray" onClick={() => setShowModal(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 
