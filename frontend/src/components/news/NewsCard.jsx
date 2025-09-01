@@ -44,8 +44,6 @@ const NewsCard = ({ article, type = 'api' }) => {
        Read Story
       </Button>
     ) : (
-      // --- THIS IS THE FIX ---
-      // It now links to your internal /article/:id page
       <Button as={Link} to={`/article/${article.id}`} className="mt-auto">
         Read & Discuss
       </Button>

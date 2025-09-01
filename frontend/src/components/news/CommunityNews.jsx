@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getLocalNews } from '../../api/auth';
-import NewsCard from './NewsCard'; // Assuming NewsCard is in components
+import NewsCard from './NewsCard'; 
 
 const CommunityNews = () => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    // Add pagination state if needed
 
     useEffect(() => {
         const fetchNews = async () => {

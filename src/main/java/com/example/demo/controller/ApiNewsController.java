@@ -21,7 +21,6 @@ public class ApiNewsController {
 
     private final ApiNewsService apiNewsService;
 
-    // 1. Removed the unused NewsService dependency from the constructor
     public ApiNewsController(ApiNewsService apiNewsService) {
         this.apiNewsService = apiNewsService;
     }
@@ -51,7 +50,6 @@ public class ApiNewsController {
         Long accountId = userDetails.getAccount().getId();
 
         try {
-            // 2. The controller now correctly passes both the newsId and the accountId to the service
             apiNewsService.recordApiNewsViewAndAwardPointToUser(newsId, accountId);
             return ResponseEntity.ok(Map.of("message", "Point awarded for viewing API news."));
         } catch (Exception e) {

@@ -39,20 +39,20 @@ public class JwtConfig {
     public String generateToken(String username, Map<String, Object> extraClaims) {
         Key key = getSigningKey();
         return Jwts.builder()
-                .claims(extraClaims)  // Use claims() instead of setClaims()
-                .subject(username)    // Use subject() instead of setSubject()
-                .issuedAt(new Date()) // Use issuedAt() instead of setIssuedAt()
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS)) // Use expiration() instead of setExpiration()
+                .claims(extraClaims)  
+                .subject(username)    
+                .issuedAt(new Date()) 
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS)) 
                 .signWith(key)
                 .compact();
     }
 
     public Claims parseToken(String token) {
         Key key = getSigningKey();
-        Jws<Claims> claimsJws = Jwts.parser()  // Use parser() instead of parserBuilder()
-                                    .verifyWith((SecretKey) key)  // Use verifyWith() instead of setSigningKey()
+        Jws<Claims> claimsJws = Jwts.parser()  
+                                    .verifyWith((SecretKey) key)  
                                     .build()
-                                    .parseSignedClaims(token);    // Use parseSignedClaims() instead of parseClaimsJws()
-        return claimsJws.getPayload();  // Use getPayload() instead of getBody()
+                                    .parseSignedClaims(token);    
+        return claimsJws.getPayload();  
     }
 }

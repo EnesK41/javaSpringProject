@@ -1,8 +1,8 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Home, LogOut, User as UserIcon, LayoutDashboard, UserCircle } from 'lucide-react';
-import './Navbar.scss'; // Import the SCSS file
-import logo from '../assets/logo.png'; // <-- 1. IMPORT YOUR LOGO
+import './Navbar.scss'; 
+import logo from '../assets/logo.png'; 
 
 const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
@@ -55,9 +55,7 @@ const Navbar = ({ user, setUser }) => {
     <nav className="main-nav">
       <div className="navbar-container">
         <div className="nav-left">
-          {/* --- THE FIX: The logo and brand are now grouped together --- */}
           <div className="nav-brand-group">
-            {/* 2. ADD THE LOGO IMAGE HERE (Make sure the path in the import is correct) */}
             <img src={logo} alt="Site Logo" className="nav-logo" />
             <div className="nav-brand-container">
               <Link to="/community-news" className="nav-brand-secret">
@@ -68,7 +66,6 @@ const Navbar = ({ user, setUser }) => {
               </Link>
             </div>
           </div>
-          {/* ------------------------------------------------------ */}
           <Link to="/" className="nav-link">
             <Home /> Home
           </Link>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getLocalNewsById, recordLocalNewsView } from '../../api/auth';
-import { Clock, User, Award } from 'lucide-react'; // Clock is now used
+import { Clock, User, Award } from 'lucide-react'; 
 
 const CommunityNewsDetails = ({ user }) => {
   const { id } = useParams();
@@ -83,8 +83,6 @@ const CommunityNewsDetails = ({ user }) => {
               <Award className="w-4 h-4 mr-2" />
               <span>{story.views} Views</span>
             </div>
-            {/* --- THIS IS THE FIX --- */}
-            {/* We now display the publish date using the Clock icon */}
             <div className="flex items-center">
               <Clock className="w-4 h-4 mr-2" />
               <span>Published on {formattedDate}</span>

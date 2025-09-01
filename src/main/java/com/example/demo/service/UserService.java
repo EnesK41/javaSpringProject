@@ -17,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserProfileRepository userProfileRepository;
-    private final NewsRepository newsRepository; // <-- Change this
+    private final NewsRepository newsRepository; 
 
-    public UserService(UserProfileRepository userProfileRepository, NewsRepository newsRepository) { // <-- Change this
+    public UserService(UserProfileRepository userProfileRepository, NewsRepository newsRepository) { 
         this.userProfileRepository = userProfileRepository;
-        this.newsRepository = newsRepository; // <-- Change this
+        this.newsRepository = newsRepository; 
     }   
 
     public void deleteUser(Long id){
@@ -47,7 +47,6 @@ public class UserService {
     public void addBookmark(Long userAccountId, Long newsId) {
         UserProfile user = userProfileRepository.findById(userAccountId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        // FIX: Finds the news article directly from the repository.
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new RuntimeException("News not found"));
         user.getBookmarks().add(news);
@@ -58,7 +57,6 @@ public class UserService {
     public void removeBookmark(Long userAccountId, Long newsId) {
         UserProfile user = userProfileRepository.findById(userAccountId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        // FIX: Finds the news article directly from the repository.
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new RuntimeException("News not found"));
         user.getBookmarks().remove(news);

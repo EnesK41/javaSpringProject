@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getPublisherInfo, getNewsByPublisher, deleteNews } from '../api/auth';
-import { Button, Modal } from 'flowbite-react'; // <-- Import Modal
-import { HiOutlineExclamationCircle } from 'react-icons/hi'; // <-- Import an icon for the modal
+import { Button, Modal } from 'flowbite-react'; 
+import { HiOutlineExclamationCircle } from 'react-icons/hi'; 
 import NewsCard from './news/NewsCard';
 
 const PublisherInfo = ({ user }) => {
@@ -12,7 +12,6 @@ const PublisherInfo = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- NEW: State for the delete confirmation modal ---
   const [showModal, setShowModal] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState(null);
 
@@ -38,13 +37,11 @@ const PublisherInfo = ({ user }) => {
     fetchPublisherData();
   }, [fetchPublisherData]);
 
-  // --- UPDATED: This function now just opens the modal ---
   const handleDeleteClick = (article) => {
     setArticleToDelete(article);
     setShowModal(true);
   };
 
-  // --- NEW: This function runs when the user confirms the deletion ---
   const confirmDelete = async () => {
     if (!articleToDelete) return;
     try {
@@ -94,7 +91,6 @@ const PublisherInfo = ({ user }) => {
           </div>
       </div>
 
-      {/* --- NEW: The Delete Confirmation Modal --- */}
       <Modal show={showModal} size="md" onClose={() => setShowModal(false)} popup>
         <Modal.Header />
         <Modal.Body>

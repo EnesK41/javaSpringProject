@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import NewsFeed from './news/NewsFeed';
-import logo from './assets/logo.png'; // 1. Import your logo
+import logo from './assets/logo.png'; 
 
 const Home = ({ user }) => {
   return (
     <div className="bg-gray-100 font-inter pt-20">
-      {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-gray-800 to-gray-900 text-white text-center py-20 md:py-32">
         <div className="container mx-auto px-4 z-10">
 

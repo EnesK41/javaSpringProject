@@ -19,7 +19,7 @@ const CreateNews = () => {
     setError('');
     try {
       await createNews({ title, content, category, country, city });
-      navigate('/'); // Redirect to homepage or dashboard after successful creation
+      navigate('/'); 
     } catch (err) {
       setError('Failed to publish story. Please try again.');
       console.error(err);

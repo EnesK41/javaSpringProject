@@ -4,7 +4,7 @@ import com.example.demo.dto.ApiNewsDTO;
 import com.example.demo.entity.ApiNews;
 import com.example.demo.entity.UserProfile;
 import com.example.demo.repository.ApiNewsRepository;
-import com.example.demo.repository.UserProfileRepository; // 1. Import the missing repository
+import com.example.demo.repository.UserProfileRepository; 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ApiNewsService {
 
     private final ApiNewsRepository apiNewsRepository;
-    private final UserProfileRepository userProfileRepository; // 2. Add the repository as a dependency
+    private final UserProfileRepository userProfileRepository; 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -39,7 +39,6 @@ public class ApiNewsService {
 
     private final Map<String, LocalDateTime> queryCacheTimestamps = new ConcurrentHashMap<>();
 
-    // 3. Update the constructor to accept the new dependency
     public ApiNewsService(ApiNewsRepository apiNewsRepository, UserProfileRepository userProfileRepository) {
         this.apiNewsRepository = apiNewsRepository;
         this.userProfileRepository = userProfileRepository;
@@ -57,13 +56,7 @@ public class ApiNewsService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
         
-        if ("*".equals(query)) {
-            // If the query is a wildcard, fetch all articles.
-            return apiNewsRepository.findAll(pageable).map(ApiNewsDTO::new);
-        } else {
-            // Otherwise, perform the specific search.
-            return apiNewsRepository.findByQuery(query, pageable).map(ApiNewsDTO::new);
-        }
+        return apiNewsRepository.findByQuery(query, pageable).map(ApiNewsDTO::new);
     }
 
     private void fetchAndStoreFromBraveApi(String query, String country) {
@@ -115,7 +108,6 @@ public class ApiNewsService {
     }
 
     @Transactional
-    // 4. Update the method to accept the news ID (even though we don't use it, it's good practice)
     public void recordApiNewsViewAndAwardPointToUser(Long apiNewsId, Long viewingUserAccountId) {
         UserProfile viewingUser = userProfileRepository.findByAccount_Id(viewingUserAccountId)
                 .orElseThrow(() -> new RuntimeException("Viewing user not found with Account ID: " + viewingUserAccountId));

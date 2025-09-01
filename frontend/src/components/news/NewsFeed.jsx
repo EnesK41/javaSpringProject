@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { getNews } from '../../api/auth';
 import NewsCard from './NewsCard';
-// FIX: Removed unused 'Dropdown', 'Checkbox', and 'Label' imports.
 import { Button as FlowbiteButton } from 'flowbite-react';
 
 const NewsFeed = () => {
     const [articles, setArticles] = useState([]);
-    const [loading, setLoading] = useState(true); // Set initial loading to true
+    const [loading, setLoading] = useState(true); 
     const [error, setError] = useState(null);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -15,8 +14,6 @@ const NewsFeed = () => {
     const [country, setCountry] = useState('tr');
     const [searchTerm, setSearchTerm] = useState('haber'); // Default searchTerm to match query
 
-    // FIX: Removed the unused isInitialLoad state.
-    // The main useEffect now handles the initial load correctly.
 
     useEffect(() => {
         setLoading(true);
@@ -99,14 +96,12 @@ const NewsFeed = () => {
                 </select>
             </div>
 
-            {/* This logic now correctly shows a main loading spinner only on the initial load */}
             {loading && page === 0 ? (
                 <div className="text-center p-10">Loading news...</div>
             ) : (
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {articles.map((article) => (
-                            // Added a more unique key to prevent potential issues
                             <NewsCard key={`${article.id}-${article.url}`} article={article} />
                         ))}
                     </div>
@@ -115,7 +110,6 @@ const NewsFeed = () => {
 
                     {!loading && hasMore && (
                         <div className="text-center mt-12">
-                            {/* FIX: Using the imported FlowbiteButton for consistency */}
                             <FlowbiteButton onClick={() => setPage(prevPage => prevPage + 1)}>
                                 Load More
                             </FlowbiteButton>

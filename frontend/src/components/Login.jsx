@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { LogIn as LogInIcon } from 'lucide-react';
 
-// The 'login' function is now received as a prop from App.js
 const Login = ({ login, setUser }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +21,6 @@ const Login = ({ login, setUser }) => {
       // Decode token payload to get user details
       const payload = JSON.parse(atob(token.split(".")[1]));
       
-      // THE FIX: Create the user object with id, name, and role
       const user = { 
         id: payload.userId, // Extract the userId from the token
         name: payload.sub, 
@@ -33,7 +31,6 @@ const Login = ({ login, setUser }) => {
       navigate("/"); // Redirect to home page after successful login
     } catch (err) {
       console.error("Login error:", err);
-      // Improved Error Handling: Show specific backend message
       if (err.response && err.response.data) {
         // If the response data is an object with a 'message' field (from our custom handler)
         setError(err.response.data.message || "Invalid email or password.");

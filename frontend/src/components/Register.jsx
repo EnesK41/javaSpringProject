@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserPlus } from 'lucide-react';
 
-// The 'register' and 'setUser' functions are received as props from App.jsx
 const Register = ({ register, setUser }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,26 +19,21 @@ const Register = ({ register, setUser }) => {
       const response = await register({ name, email, password, role });
       const token = response.data.token;
       
-      // 1. Save the token to local storage
       localStorage.setItem("token", token);
       
-      // 2. Decode the token to get user info and update App state
       const payload = JSON.parse(atob(token.split(".")[1]));
       
-      // THE FIX: Create the user object with id, name, and role
       const user = { 
-        id: payload.userId, // Extract the userId from the token
+        id: payload.userId, 
         name: payload.sub, 
         role: payload.role 
       };
-      setUser(user); // Update user state in App.jsx with the complete object
+      setUser(user); 
 
-      // 3. Navigate to the home page as a logged-in user
       navigate("/"); 
 
     } catch (err) {
       console.error("Registration error:", err);
-      // Improved Error Handling: Show specific backend message
       if (err.response && err.response.data) {
         // If the response data is an object with a 'message' field (from our custom handler)
         setError(err.response.data.message || "Registration failed.");

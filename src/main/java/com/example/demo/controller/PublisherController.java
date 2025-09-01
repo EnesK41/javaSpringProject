@@ -40,7 +40,6 @@ public class PublisherController {
 
     @PostMapping("/news")
     @PreAuthorize("hasRole('PUBLISHER')")
-    // FIX: Using the renamed PublishNewsDTO and added @Valid to enable validation.
     public ResponseEntity<NewsDTO> publishNews(@Valid @RequestBody PublishNewsDTO dto, Authentication authentication){
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long accountId = userDetails.getAccount().getId();
@@ -50,7 +49,6 @@ public class PublisherController {
 
     @DeleteMapping("/news/{newsId}")
     @PreAuthorize("hasRole('PUBLISHER') || hasRole('ADMIN')")
-    // FIX: The path variable is now correctly named "newsId".
     public ResponseEntity<Void> deleteNews(@PathVariable Long newsId, Authentication authentication){
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long accountId = userDetails.getAccount().getId();

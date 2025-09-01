@@ -2,7 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.GetPublisherInfoDTO;
 import com.example.demo.dto.NewsDTO;
-import com.example.demo.dto.PublishNewsDTO; // Assuming this is your DTO for creating news
+import com.example.demo.dto.PublishNewsDTO; 
 import com.example.demo.entity.News;
 import com.example.demo.entity.PublisherProfile;
 import com.example.demo.repository.NewsRepository;
@@ -72,11 +72,9 @@ public class PublisherService {
         news.setPublisher(publisher);
         news.setViews(0);
         
-        // FIX: Generate the slug and set the URL *before* saving.
         String slug = slugify.slugify(dto.getTitle());
         news.setUrl("/dispatch/" + slug);
 
-        // FIX: Save the entity only once.
         News savedNews = newsRepository.save(news);
         return new NewsDTO(savedNews);
     }
@@ -95,7 +93,6 @@ public class PublisherService {
         }
 
         userService.removeNewsFromBookmarks(news);
-        // FIX: The service now deletes directly from the NewsRepository.
         newsRepository.delete(news);
     }
 }

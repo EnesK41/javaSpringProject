@@ -21,12 +21,5 @@ public class UserController {
         GetUserInfoDTO dto = userService.getUserInfo(id);
         return ResponseEntity.ok(dto);
     }
-
-    /*@GetMapping("/{id}/bookmarks")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<GetUserInfoDTO> getBookmarks(@PathVariable Long id){
-        GetUserInfoDTO dto = userService.getUserInfo(id);
-        return ResponseEntity.ok(dto);
-    }*/
-    //public void like(){}
+    
 }
