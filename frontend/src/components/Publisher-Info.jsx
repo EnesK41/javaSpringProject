@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getPublisherInfo, getNewsByPublisher, deleteNews } from '../api/auth';
 import { Button, Modal } from 'flowbite-react'; // <-- Import Modal
 import { HiOutlineExclamationCircle } from 'react-icons/hi'; // <-- Import an icon for the modal
-import NewsCard from './NewsCard';
+import NewsCard from './news/NewsCard';
 
 const PublisherInfo = ({ user }) => {
   const { id } = useParams();

@@ -19,7 +19,7 @@ import com.example.demo.service.NewsService;
 import org.springframework.security.core.Authentication;
 
 @RestController
-@RequestMapping("/local-news")
+@RequestMapping("/api/local-news")
 public class NewsController {
     private final NewsService newsService;
 
@@ -48,5 +48,12 @@ public class NewsController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
+    }
+
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<NewsDTO> getLocalNewsById(@PathVariable Long id) {
+        NewsDTO newsDto = newsService.getLocalNewsById(id);
+        return ResponseEntity.ok(newsDto);
     }
 }

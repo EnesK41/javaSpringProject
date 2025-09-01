@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getLocalNews } from '../api/auth';
-import NewsCard from '../components/NewsCard'; // Assuming NewsCard is in components
+import { getLocalNews } from '../../api/auth';
+import NewsCard from './NewsCard'; // Assuming NewsCard is in components
 
 const CommunityNews = () => {
     const [articles, setArticles] = useState([]);

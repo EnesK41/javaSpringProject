@@ -62,4 +62,11 @@ public class NewsService {
         return newsRepository.findById(newsId)
                 .orElseThrow(() -> new RuntimeException("News not found"));
     }
+
+    @Transactional(readOnly = true)
+    public NewsDTO getLocalNewsById(Long id) {
+        News news = newsRepository.findByIdWithPublisherAndAccount(id)
+                .orElseThrow(() -> new RuntimeException("News not found with ID: " + id));
+        return new NewsDTO(news);
+    }
 }

@@ -7,8 +7,11 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import PublisherInfo from "./components/Publisher-Info";
 import UserInfo from "./components/User-Info";
-import CommunityNews from "./components/CommunityNews";
-import CreateNews from "./components/CreateNews";
+import CommunityNews from "./components/news/CommunityNews";
+import CreateNews from "./components/news/CreateNews";
+import CommunityNewsDetails from "./components/news/CommunityNewsDetails";
+import ApiNewsDetails from "./components/news/ApiNewsDetails";  
+
 
 import { register, login, getPublisherInfo, getUserInfo } from "./api/auth";
 
@@ -60,6 +63,9 @@ function App() {
         <Route path="/user/:id/info" element={<UserInfo user={user} getUserInfo={getUserInfo} />} />
         <Route path="/community-news" element={<CommunityNews />} />
         <Route path="/publisher/create-news" element={<CreateNews />} />
+        <Route path="/dispatch/:id" element={<CommunityNewsDetails user={user} />} />
+        <Route path="/article/:id" element={<ApiNewsDetails user={user} />} />
+
       </Routes>
     </Router>
   );

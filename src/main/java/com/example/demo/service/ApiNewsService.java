@@ -2,7 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.dto.ApiNewsDTO;
 import com.example.demo.entity.ApiNews;
+import com.example.demo.entity.UserProfile;
 import com.example.demo.repository.ApiNewsRepository;
+import com.example.demo.repository.UserProfileRepository; // 1. Import the missing repository
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,17 +30,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ApiNewsService {
 
     private final ApiNewsRepository apiNewsRepository;
+    private final UserProfileRepository userProfileRepository; // 2. Add the repository as a dependency
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${brave.api.key}")
     private String braveApiKey;
 
-    // The cache logic correctly lives inside the service layer.
     private final Map<String, LocalDateTime> queryCacheTimestamps = new ConcurrentHashMap<>();
 
-    public ApiNewsService(ApiNewsRepository apiNewsRepository) {
+    // 3. Update the constructor to accept the new dependency
+    public ApiNewsService(ApiNewsRepository apiNewsRepository, UserProfileRepository userProfileRepository) {
         this.apiNewsRepository = apiNewsRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     @Transactional
@@ -53,20 +57,21 @@ public class ApiNewsService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
         
-        // --- THE FIX ---
-        // Instead of findAll(), we now use our new, more specific query method.
-        // This ensures the results match the user's search term.
-        return apiNewsRepository.findByQuery(query, pageable).map(ApiNewsDTO::new);
+        if ("*".equals(query)) {
+            // If the query is a wildcard, fetch all articles.
+            return apiNewsRepository.findAll(pageable).map(ApiNewsDTO::new);
+        } else {
+            // Otherwise, perform the specific search.
+            return apiNewsRepository.findByQuery(query, pageable).map(ApiNewsDTO::new);
+        }
     }
 
-    // This method is private as it's only called by the main getNews method.
     private void fetchAndStoreFromBraveApi(String query, String country) {
-        // The URL is now built dynamically with the filter parameters.
         String url = UriComponentsBuilder
                 .fromUriString("https://api.search.brave.com/res/v1/news/search")
                 .queryParam("q", query)
                 .queryParam("country", country)
-                .queryParam("count", 50) // Fetch a good number of articles to cache
+                .queryParam("count", 50)
                 .toUriString();
 
         HttpHeaders headers = new HttpHeaders();
@@ -90,7 +95,7 @@ public class ApiNewsService {
                         article.setSource(articleNode.path("meta_url").path("hostname").asText());
                         article.setImageUrl(articleNode.path("thumbnail").path("src").asText(null));
                         String dateString = articleNode.path("page_age").asText(null);
-                        if (dateString != null) {
+                        if (dateString != null && !dateString.isEmpty()) {
                             article.setPublishedAt(LocalDateTime.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         }
                         apiNewsRepository.save(article);
@@ -100,5 +105,23 @@ public class ApiNewsService {
         } catch (Exception e) {
             System.err.println("Failed to fetch news from Brave API: " + e.getMessage());
         }
+    }
+    
+    @Transactional(readOnly = true)
+    public ApiNewsDTO getApiNewsById(Long id) {
+        ApiNews article = apiNewsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("API News article not found with ID: " + id));
+        return new ApiNewsDTO(article);
+    }
+
+    @Transactional
+    // 4. Update the method to accept the news ID (even though we don't use it, it's good practice)
+    public void recordApiNewsViewAndAwardPointToUser(Long apiNewsId, Long viewingUserAccountId) {
+        UserProfile viewingUser = userProfileRepository.findByAccount_Id(viewingUserAccountId)
+                .orElseThrow(() -> new RuntimeException("Viewing user not found with Account ID: " + viewingUserAccountId));
+        
+        viewingUser.setPoints(viewingUser.getPoints() + 1);
+
+        userProfileRepository.save(viewingUser);
     }
 }

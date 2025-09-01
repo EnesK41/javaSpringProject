@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import NewsFeed from './NewsFeed';
+import NewsFeed from './news/NewsFeed';
 import logo from './assets/logo.png'; // 1. Import your logo
 
 const Home = ({ user }) => {

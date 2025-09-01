@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8080", // your Spring Boot backend
+  baseURL: "http://localhost:8080",
 });
 
 // Add token to requests if logged in
@@ -11,45 +11,60 @@ API.interceptors.request.use(config => {
   return config;
 });
 
-// Login function (send email)
+// --- Auth Endpoints ---
 export const login = (email, password) => {
-  console.log("[DEBUG] Sending login request:", email);
   return API.post("/auth/login", { email, password });
 };
-// Register function
+
 export const register = ({ name, email, password, role }) => {
-  console.log("[DEBUG] Sending register request:", name, email, role);
   return API.post("/auth/register", { name, email, password, role });
 };
 
+// --- Publisher Endpoints ---
 export const getPublisherInfo = (id) => {
-  console.log("[DEBUG] Sending getPublisherInfo request:", id);
-  return API.get(`/publisher/${id}/info`);
+  return API.get(`/api/publisher/${id}/info`); // Standardized
 };
 
-export const getUserInfo = (id) => {
-  console.log("[DEBUG] Sending getUserInfo request:", id);
-  return API.get(`/user/${id}/info`);
-};
-
-export const getNews = (query = 'latest headlines', country = 'us', page = 0, size = 10) => {
-  return API.get(`/api/news?query=${query}&country=${country}&page=${page}&size=${size}`);
+export const getNewsByPublisher = (publisherId) => {
+  return API.get(`/api/publisher/${publisherId}/news`); // Standardized
 };
 
 export const createNews = (newsData) => {
-  return API.post("/publisher/news", newsData);
+  return API.post("/api/publisher/news", newsData); // Standardized
 };
 
 export const deleteNews = (newsId) => {
-  return API.delete(`/publisher/news/${newsId}`);
+  return API.delete(`/api/publisher/news/${newsId}`); // Standardized
 };
 
-export const getLocalNews = (page = 0, size = 10) => {
-    return API.get(`/local-news?page=${page}&size=${size}`);
-}
+// --- User Endpoints ---
+export const getUserInfo = (id) => {
+  return API.get(`/api/user/${id}/info`); // Standardized
+};
 
-export const getNewsByPublisher = (publisherId) => {
-    return API.get(`/publisher/${publisherId}/news`); 
-}
+// --- News Endpoints ---
+export const getNews = (query = 'latest headlines', country = 'us', page = 0, size = 9) => {
+  return API.get(`/api/news?query=${query}&country=${country}&page=${page}&size=${size}`);
+};
+
+export const getApiNewsById = (id) => {
+  return API.get(`/api/news/${id}`);
+};
+
+export const recordApiNewsView = (newsId) => {
+  return API.post(`/api/news/${newsId}/view`);
+};
+
+export const getLocalNews = (page = 0, size = 9) => {
+  return API.get(`/api/local-news?page=${page}&size=${size}`); 
+};
+
+export const getLocalNewsById = (id) => {
+  return API.get(`/api/local-news/${id}`);
+};
+
+export const recordLocalNewsView = (newsId) => {
+  return API.post(`/api/local-news/${newsId}/view`);
+};
 
 export default API;

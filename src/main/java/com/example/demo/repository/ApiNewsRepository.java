@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface ApiNewsRepository extends JpaRepository<ApiNews, Long> {
-    // A helper method to check if an article already exists
     Optional<ApiNews> findByUrl(String url);
     @Query("SELECT a FROM ApiNews a WHERE LOWER(a.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(a.description) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<ApiNews> findByQuery(@Param("query") String query, Pageable pageable);
