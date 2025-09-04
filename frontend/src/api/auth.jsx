@@ -43,7 +43,7 @@ export const getUserInfo = (id) => {
 };
 
 // --- News Endpoints ---
-export const getNews = (query = 'latest headlines', country = 'us', page = 0, size = 9) => {
+export const getNews = (query = 'haber', country = 'tr', page = 0, size = 9) => {
   return API.get(`/api/news?query=${query}&country=${country}&page=${page}&size=${size}`);
 };
 
