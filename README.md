@@ -1,5 +1,3 @@
-<markdown:README Dosyası (Formatlanmış):README.md
-
 SecretNews - Full-Stack Haber ve İçerik Platformu
 ![SecretNews Logo](./images/Logo.png)
 SecretNews, Java (Spring Boot) ve React.js kullanılarak geliştirilmiş, topluluk tabanlı, full-stack bir haber ve içerik platformudur. Proje, harici bir REST API'den güncel haberleri çekme ve kullanıcıların "yayıncı" rolüyle kendi kurgusal, SCP-vari "gizli" haberlerini oluşturup paylaşabildiği çift katmanlı bir yapıya sahiptir.
